@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+find_package(Threads)
+find_package(GMock CONFIG REQUIRED)
+find_package(spirv-tools CONFIG REQUIRED)
+find_package(glslang CONFIG REQUIRED)
+
+check_required_components("@PROJECT_NAME@")
+
+include ("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")

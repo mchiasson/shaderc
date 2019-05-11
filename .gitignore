@@ -14,3 +14,4 @@ third_party/spirv-headers/
 third_party/spirv-cross/
 android_test/libs
 .DS_Store
+CMakeLists.txt.user
