@@ -14,9 +14,9 @@ hunter_config(SPIRV-Tools
 )
 
 hunter_config(glslang
-    VERSION v7.11.3188-p3
-    URL https://github.com/mchiasson/glslang/archive/v7.11.3188-p3.tar.gz
-    SHA1 d515bf21e7a9207e21549314fbcb27c712ee8058
+    VERSION v7.11.3188-p4
+    URL https://github.com/mchiasson/glslang/archive/v7.11.3188-p4.tar.gz
+    SHA1 967ac6509bf5383121fd89dd6161377ed5364135
     KEEP_PACKAGE_SOURCES
     CMAKE_ARGS ENABLE_HLSL=ON BUILD_TESTING=OFF
 )
