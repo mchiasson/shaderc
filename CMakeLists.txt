@@ -136,7 +136,7 @@ define_pkg_config_file(shaderc -lshaderc_shared)
 define_pkg_config_file(shaderc_static "-lshaderc ${EXTRA_STATIC_PKGCONFIG_LIBS} -lshaderc_util")
 define_pkg_config_file(shaderc_combined -lshaderc_combined)
 
-set (SHADERC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_DATADIR}/shaderc/cmake)
+set (SHADERC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/shaderc)
 
 install(
     EXPORT shadercTargets
