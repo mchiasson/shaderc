@@ -7,7 +7,7 @@ HunterGate(
     LOCAL
 )
 
-project(shaderc VERSION 2018.0)
+project(shaderc VERSION 2019.0)
 
 
 hunter_add_package(GTest)
@@ -101,11 +101,7 @@ add_subdirectory(libshaderc)
 add_subdirectory(glslc)
 add_subdirectory(examples)
 
-add_custom_target(build-version
-  ${PYTHON_EXECUTABLE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/utils/update_build_version.py
-  ${shaderc_SOURCE_DIR} ${SPIRV-TOOLS_ROOT}/../Build/SPIRV-Tools/Source ${GLSLANG_ROOT}/../Build/glslang/Source
-  COMMENT "Update build-version.inc in the Shaderc build directory (if necessary).")
+configure_file(build-version.inc.in ${PROJECT_BINARY_DIR}/build-version.inc)
 
 function(define_pkg_config_file NAME LIBS)
   add_custom_target(${NAME}-pkg-config ALL

@@ -25,7 +25,6 @@ shaderc_default_compile_options(glslc_exe)
 target_include_directories(glslc_exe PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/..)
 set_target_properties(glslc_exe PROPERTIES OUTPUT_NAME glslc)
 target_link_libraries(glslc_exe PRIVATE glslc shaderc_util shaderc)
-add_dependencies(glslc_exe build-version)
 
 shaderc_add_tests(
   TEST_PREFIX glslc
