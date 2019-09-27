@@ -11,11 +11,11 @@ set(SPVC_SOURCES
 
 add_library(shaderc_spvc STATIC ${SPVC_SOURCES})
 shaderc_default_compile_options(shaderc_spvc)
-target_include_directories(shaderc_spvc PUBLIC include PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${spirv-tools_SOURCE_DIR}/include ${SPIRV-Cross_SOURCE_DIR}/..)
+target_include_directories(shaderc_spvc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include> PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include)
 
 add_library(shaderc_spvc_shared SHARED ${SPVC_SOURCES})
 shaderc_default_compile_options(shaderc_spvc_shared)
-target_include_directories(shaderc_spvc_shared PUBLIC include PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${spirv-tools_SOURCE_DIR}/include ${SPIRV-Cross_SOURCE_DIR}/..)
+target_include_directories(shaderc_spvc_shared PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include> PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include)
 
 target_compile_definitions(shaderc_spvc_shared
     PRIVATE SHADERC_IMPLEMENTATION
@@ -38,6 +38,7 @@ if(SHADERC_ENABLE_INSTALL)
       ${CMAKE_INSTALL_INCLUDEDIR}/shaderc)
 
   install(TARGETS shaderc_spvc shaderc_spvc_shared
+    EXPORT shadercTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -45,12 +46,12 @@ endif(SHADERC_ENABLE_INSTALL)
 
 find_package(Threads)
 set(SPVC_LIBS
-  ${CMAKE_THREAD_LIBS_INIT}
-  SPIRV-Tools
-  SPIRV-Tools-opt
-  spirv-cross-glsl
-  spirv-cross-hlsl
-  spirv-cross-msl
+  Threads::Threads
+  SPIRV-Tools::SPIRV-Tools
+  SPIRV-Tools::SPIRV-Tools-opt
+  SPIRV-Cross::spirv-cross-glsl
+  SPIRV-Cross::spirv-cross-hlsl
+  SPIRV-Cross::spirv-cross-msl
 )
 
 target_link_libraries(shaderc_spvc PRIVATE ${SPVC_LIBS})
@@ -89,7 +90,7 @@ if(SHADERC_ENABLE_INSTALL)
     # around this problem by manually substitution.
     string(REPLACE "$(Configuration)" "\${CMAKE_INSTALL_CONFIG_NAME}"
       install_location "${generated_location}")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${install_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(FILES ${install_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
   else()
     install(FILES ${generated_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
   endif()
