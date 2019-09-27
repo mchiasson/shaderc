@@ -1,10 +1,7 @@
 # utility functions
 
 function (shaderc_use_gmock TARGET)
-  target_include_directories(${TARGET} PRIVATE
-    ${gmock_SOURCE_DIR}/include
-    ${gtest_SOURCE_DIR}/include)
-  target_link_libraries(${TARGET} PRIVATE gmock gtest_main)
+  target_link_libraries(${TARGET} PRIVATE GMock::main)
 endfunction(shaderc_use_gmock)
 
 function(shaderc_default_c_compile_options TARGET)

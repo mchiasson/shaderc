@@ -15,11 +15,11 @@
 #include "shaderc/spvc.h"
 
 #include "libshaderc_util/exceptions.h"
-#include "spirv-cross/spirv_glsl.hpp"
-#include "spirv-cross/spirv_hlsl.hpp"
-#include "spirv-cross/spirv_msl.hpp"
 #include "spirv-tools/libspirv.hpp"
 #include "spirv-tools/optimizer.hpp"
+#include "spirv_cross/spirv_glsl.hpp"
+#include "spirv_cross/spirv_hlsl.hpp"
+#include "spirv_cross/spirv_msl.hpp"
 
 // GLSL version produced when none specified nor detected from source.
 #define DEFAULT_GLSL_VERSION 450
