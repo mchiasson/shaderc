@@ -12,11 +12,18 @@ set(SHADERC_SOURCES
 
 add_library(shaderc STATIC ${SHADERC_SOURCES})
 shaderc_default_compile_options(shaderc)
-target_include_directories(shaderc PUBLIC include PRIVATE ${glslang_SOURCE_DIR})
+target_include_directories(shaderc
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>
+)
 
 add_library(shaderc_shared SHARED ${SHADERC_SOURCES})
 shaderc_default_compile_options(shaderc_shared)
-target_include_directories(shaderc_shared PUBLIC include PRIVATE ${glslang_SOURCE_DIR})
+target_include_directories(shaderc_shared PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 target_compile_definitions(shaderc_shared
     PRIVATE SHADERC_IMPLEMENTATION
     PUBLIC SHADERC_SHAREDLIB
@@ -35,6 +42,7 @@ if(SHADERC_ENABLE_INSTALL)
       ${CMAKE_INSTALL_INCLUDEDIR}/shaderc)
 
   install(TARGETS shaderc shaderc_shared
+    EXPORT shadercTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -42,10 +50,8 @@ endif(SHADERC_ENABLE_INSTALL)
 
 find_package(Threads)
 set(SHADERC_LIBS
-  glslang OSDependent OGLCompiler glslang ${CMAKE_THREAD_LIBS_INIT}
-  shaderc_util
-  SPIRV # from glslang
-  SPIRV-Tools
+  glslang::glslang glslang::OSDependent glslang::OGLCompiler glslang::glslang
+  Threads::Threads shaderc_util glslang::SPIRV SPIRV-Tools::SPIRV-Tools
 )
 
 target_link_libraries(shaderc PRIVATE ${SHADERC_LIBS})
@@ -54,8 +60,7 @@ target_link_libraries(shaderc_shared PRIVATE ${SHADERC_LIBS})
 shaderc_add_tests(
   TEST_PREFIX shaderc
   LINK_LIBS shaderc
-  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${glslang_SOURCE_DIR}
-               ${spirv-tools_SOURCE_DIR}/include
+  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include
   TEST_NAMES
     shaderc
     shaderc_cpp
@@ -64,8 +69,7 @@ shaderc_add_tests(
 shaderc_add_tests(
   TEST_PREFIX shaderc_shared
   LINK_LIBS shaderc_shared SPIRV-Tools
-  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${glslang_SOURCE_DIR}
-               ${spirv-tools_SOURCE_DIR}/include
+  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include
   TEST_NAMES
     shaderc
     shaderc_cpp
@@ -92,9 +96,8 @@ endif(SHADERC_ENABLE_INSTALL)
 
 shaderc_add_tests(
   TEST_PREFIX shaderc_combined
-  LINK_LIBS shaderc_combined ${CMAKE_THREAD_LIBS_INIT}
-  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${glslang_SOURCE_DIR}
-               ${spirv-tools_SOURCE_DIR}/include
+  LINK_LIBS shaderc_combined Threads::Threads
+  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include
   TEST_NAMES
     shaderc
     shaderc_cpp)

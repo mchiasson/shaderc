@@ -1,0 +1,3 @@
+"shaderc v${shaderc_VERSION}-hunter\n"
+"spirv-tools v${spirv-tools_VERSION}-hunter\n"
+"glslang v${glslang_VERSION}-hunter\n"
