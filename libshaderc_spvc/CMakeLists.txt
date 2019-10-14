@@ -9,25 +9,22 @@ set(SPVC_SOURCES
   src/spvc.cc
 )
 
-add_library(shaderc_spvc STATIC ${SPVC_SOURCES})
+add_library(shaderc_spvc ${SPVC_SOURCES})
 shaderc_default_compile_options(shaderc_spvc)
-target_include_directories(shaderc_spvc PUBLIC include PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${spirv-tools_SOURCE_DIR}/include ${SPIRV-Cross_SOURCE_DIR}/..)
+target_include_directories(shaderc_spvc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include)
 
-add_library(shaderc_spvc_shared SHARED ${SPVC_SOURCES})
-shaderc_default_compile_options(shaderc_spvc_shared)
-target_include_directories(shaderc_spvc_shared PUBLIC include PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${spirv-tools_SOURCE_DIR}/include ${SPIRV-Cross_SOURCE_DIR}/..)
-
-target_compile_definitions(shaderc_spvc_shared
+if (BUILD_SHARED_LIBS)
+  target_compile_definitions(shaderc_spvc
     PRIVATE SHADERC_IMPLEMENTATION
     PUBLIC SHADERC_SHAREDLIB
-)
+  )
+  set_target_properties(shaderc_spvc PROPERTIES SOVERSION 1)
+endif()
 
 if (DISABLE_EXCEPTIONS)
   target_compile_definitions(shaderc_spvc PRIVATE SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS)
-  target_compile_definitions(shaderc_spvc_shared PRIVATE SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS)
 endif (DISABLE_EXCEPTIONS)
 
-set_target_properties(shaderc_spvc_shared PROPERTIES SOVERSION 1)
 
 if(SHADERC_ENABLE_INSTALL)
   install(
@@ -37,7 +34,8 @@ if(SHADERC_ENABLE_INSTALL)
     DESTINATION
       ${CMAKE_INSTALL_INCLUDEDIR}/shaderc)
 
-  install(TARGETS shaderc_spvc shaderc_spvc_shared
+  install(TARGETS shaderc_spvc
+    EXPORT shadercTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -45,30 +43,19 @@ endif(SHADERC_ENABLE_INSTALL)
 
 find_package(Threads)
 set(SPVC_LIBS
-  ${CMAKE_THREAD_LIBS_INIT}
-  SPIRV-Tools
-  SPIRV-Tools-opt
+  Threads::Threads
+  SPIRV-Tools::SPIRV-Tools
+  SPIRV-Tools::SPIRV-Tools-opt
   spirv-cross-glsl
   spirv-cross-hlsl
   spirv-cross-msl
 )
 
 target_link_libraries(shaderc_spvc PRIVATE ${SPVC_LIBS})
-target_link_libraries(shaderc_spvc_shared PRIVATE ${SPVC_LIBS})
 
 shaderc_add_tests(
   TEST_PREFIX shaderc
   LINK_LIBS shaderc_spvc
-  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc/include ${SPIRV-Cross_SOURCE_DIR}/..
-  TEST_NAMES
-    spvc
-    spvc_cpp
-    spvc_webgpu
-    spvc_webgpu_cpp)
-
-shaderc_add_tests(
-  TEST_PREFIX shaderc_shared
-  LINK_LIBS shaderc_spvc_shared SPIRV-Tools SPIRV-Tools-opt
   INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc/include ${SPIRV-Cross_SOURCE_DIR}/..
   TEST_NAMES
     spvc
@@ -89,7 +76,7 @@ if(SHADERC_ENABLE_INSTALL)
     # around this problem by manually substitution.
     string(REPLACE "$(Configuration)" "\${CMAKE_INSTALL_CONFIG_NAME}"
       install_location "${generated_location}")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${install_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(FILES ${install_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
   else()
     install(FILES ${generated_location} DESTINATION ${CMAKE_INSTALL_LIBDIR})
   endif()

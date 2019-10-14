@@ -1,5 +1,26 @@
-cmake_minimum_required(VERSION 2.8.12)
-project(shaderc)
+cmake_minimum_required(VERSION 3.2)
+
+include(cmake/HunterGate.cmake)
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.220.tar.gz"
+    SHA1 "c2296fdc5ad3b1085a2ea985600f36d5a1351b93"
+)
+
+project(shaderc VERSION 2019.0)
+
+hunter_add_package(GTest)
+hunter_add_package(glslang)
+hunter_add_package(spirv-cross)
+
+find_package(Threads)
+find_package(GMock CONFIG REQUIRED)
+find_package(glslang CONFIG REQUIRED)
+find_package(spirv_cross_core CONFIG REQUIRED)
+find_package(spirv_cross_glsl CONFIG REQUIRED)
+find_package(spirv_cross_hlsl CONFIG REQUIRED)
+find_package(spirv_cross_msl CONFIG REQUIRED)
+find_package(spirv_cross_util CONFIG REQUIRED)
+
 enable_testing()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -31,6 +52,7 @@ set (CMAKE_CXX_STANDARD 11)
 option(SHADERC_ENABLE_NV_EXTENSIONS "Enables support of Nvidia-specific extensions" ON)
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 include(cmake/setup_build.cmake)
 include(cmake/utils.cmake)
 
@@ -81,11 +103,7 @@ add_subdirectory(libshaderc)
 add_subdirectory(glslc)
 add_subdirectory(examples)
 
-add_custom_target(build-version
-  ${PYTHON_EXECUTABLE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/utils/update_build_version.py
-  ${shaderc_SOURCE_DIR} ${spirv-tools_SOURCE_DIR} ${glslang_SOURCE_DIR}
-  COMMENT "Update build-version.inc in the Shaderc build directory (if necessary).")
+configure_file(cmake/build-version.inc.in ${PROJECT_BINARY_DIR}/build-version.inc)
 
 function(define_pkg_config_file NAME LIBS)
   add_custom_target(${NAME}-pkg-config ALL
@@ -115,3 +133,29 @@ endif()
 define_pkg_config_file(shaderc -lshaderc_shared)
 define_pkg_config_file(shaderc_static "-lshaderc ${EXTRA_STATIC_PKGCONFIG_LIBS} -lshaderc_util")
 define_pkg_config_file(shaderc_combined -lshaderc_combined)
+
+set (SHADERC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+install(
+    EXPORT ${PROJECT_NAME}Targets
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${SHADERC_CONFIG_INSTALL_DIR}
+)
+
+write_basic_package_version_file(
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    ${PROJECT_SOURCE_DIR}/cmake/config.cmake.in
+    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${SHADERC_CONFIG_INSTALL_DIR}
+)
+
+install(
+  FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  DESTINATION ${SHADERC_CONFIG_INSTALL_DIR}
+)
