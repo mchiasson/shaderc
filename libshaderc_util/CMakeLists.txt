@@ -25,6 +25,7 @@ add_library(shaderc_util STATIC
 shaderc_default_compile_options(shaderc_util)
 target_include_directories(shaderc_util
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include>
 )
 
 find_package(Threads)

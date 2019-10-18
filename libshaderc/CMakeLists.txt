@@ -12,7 +12,10 @@ set(SHADERC_SOURCES
 
 add_library(shaderc ${SHADERC_SOURCES})
 shaderc_default_compile_options(shaderc)
-target_include_directories(shaderc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_include_directories(shaderc
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include>
+)
 if(BUILD_SHARED_LIBS)
   target_compile_definitions(shaderc
     PRIVATE SHADERC_IMPLEMENTATION

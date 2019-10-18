@@ -11,7 +11,12 @@ set(SPVC_SOURCES
 
 add_library(shaderc_spvc ${SPVC_SOURCES})
 shaderc_default_compile_options(shaderc_spvc)
-target_include_directories(shaderc_spvc PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include ${shaderc_SOURCE_DIR}/libshaderc_util/include)
+target_include_directories(shaderc_spvc
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include>
+  PRIVATE ${shaderc_SOURCE_DIR}/libshaderc/include
+          ${shaderc_SOURCE_DIR}/libshaderc_util/include
+)
 
 if (BUILD_SHARED_LIBS)
   target_compile_definitions(shaderc_spvc
